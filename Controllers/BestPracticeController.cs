@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Net.Http;
 using System.Net;
-using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace PaccarAPI.Controllers
@@ -52,38 +51,14 @@ namespace PaccarAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<BestPractice>> PostBestPractice([FromBody]BestPractice bp)
         {
-            // Regex rgx = new Regex("[^a-zA-Z0-9 -]");
-            // bp.Department = rgx.Replace(bp.Department, "");
-            // foreach(char c in bp.Company) {
-            //     if(c != '\\' && c != '"' && c!= '[' && c!= ']') {
-            //         comp += c;
-            //     }
-            //     if(c == ',') {
-            //         comp += ' ';
-            //     }
-            // }
             string comp = removeChars(bp.Company);
             string dept = removeChars(bp.Department);
-            // foreach(char c in bp.Department) {
-            //     if(c != '\\' && c != '"' && c!= '[' && c!= ']') {
-            //         dept += c;
-            //     }
-            //     if(c == ',') {
-            //         dept += ' ';
-            //     }
-            // }
-            BestPractice bpmodel = new BestPractice {
-                Title = bp.Title,
-                Summary = bp.Summary,
-                Date = bp.Date,
-                Company = comp,
-                Department = dept,
-                PN = bp.PN,
-                Practice = bp.Practice
-            };
-            db.BestPractices.Add(bpmodel);
+            bp.Company = comp;
+            bp.Department = dept;
+            db.BestPractices.Add(bp);
             await db.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetBestPractice), new { id = bpmodel.Id }, bp);
+            int id = bp.Id;
+            return CreatedAtAction(nameof(GetBestPractice), new {id}, bp);
         }
 
         // PUT: api/User/5
