@@ -12,12 +12,10 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace PaccarAPI.Controllers
 {
     [Route("api/[controller]")]
-    public class BestPracticeController : Controller
+    public class BestPracticeController : ControllerBase
     {
         private readonly PaccarDbContext db;
         public BestPracticeController(PaccarDbContext dbContext)
