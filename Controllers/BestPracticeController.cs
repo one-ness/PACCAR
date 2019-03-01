@@ -10,6 +10,7 @@ using System.Web.Http;
 using System.Net.Http;
 using System.Net;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,11 +25,11 @@ namespace PaccarAPI.Controllers
             db = dbContext;
         }
 
-        // GET: api/values
+        // GET: api/User
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<ActionResult<IEnumerable<BestPractice>>> GetBestPractices()
         {
-            return new string[] { "value1", "value2" };
+            return await db.BestPractices.ToListAsync();
         }
 
         // GET: api/User/5
@@ -55,25 +56,24 @@ namespace PaccarAPI.Controllers
         {
             // Regex rgx = new Regex("[^a-zA-Z0-9 -]");
             // bp.Department = rgx.Replace(bp.Department, "");
-            string comp = "";
-            foreach(char c in bp.Company) {
-                if(c != '\\' && c != '"' && c!= '[' && c!= ']') {
-                    comp += c;
-                }
-                if(c == ',') {
-                    comp += ' ';
-                }
-            }
-
-            string dept = "";
-            foreach(char c in bp.Department) {
-                if(c != '\\' && c != '"' && c!= '[' && c!= ']') {
-                    dept += c;
-                }
-                if(c == ',') {
-                    dept += ' ';
-                }
-            }
+            // foreach(char c in bp.Company) {
+            //     if(c != '\\' && c != '"' && c!= '[' && c!= ']') {
+            //         comp += c;
+            //     }
+            //     if(c == ',') {
+            //         comp += ' ';
+            //     }
+            // }
+            string comp = removeChars(bp.Company);
+            string dept = removeChars(bp.Department);
+            // foreach(char c in bp.Department) {
+            //     if(c != '\\' && c != '"' && c!= '[' && c!= ']') {
+            //         dept += c;
+            //     }
+            //     if(c == ',') {
+            //         dept += ' ';
+            //     }
+            // }
             BestPractice bpmodel = new BestPractice {
                 Title = bp.Title,
                 Summary = bp.Summary,
@@ -88,17 +88,46 @@ namespace PaccarAPI.Controllers
             return CreatedAtAction(nameof(GetBestPractice), new { id = bpmodel.Id }, bp);
         }
 
-        // PUT api/values/5
+        // PUT: api/User/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public async Task<IActionResult> PutBestPractice(int id, BestPractice bp)
         {
+            if (id != bp.Id)
+            {
+                return BadRequest();
+            }
+            db.Entry(bp).State = EntityState.Modified;
+            await db.SaveChangesAsync();
+            return NoContent();
         }
 
-        // DELETE api/values/5
+        // DELETE: api/User/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> DeleteBestPractice(int id)
         {
+            var bp = await db.BestPractices.FindAsync(id);
 
+            if (bp == null)
+            {
+                return NotFound();
+            }
+            db.BestPractices.Remove(bp);
+            await db.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private static string removeChars(string input) {
+            string output = "";
+            foreach(char c in input) {
+                if(c != '\\' && c != '"' && c!= '[' && c!= ']') {
+                    output += c;
+                }
+                if(c == ',') {
+                    output += ' ';
+                }
+            }
+            return output;
         }
     }
 }
