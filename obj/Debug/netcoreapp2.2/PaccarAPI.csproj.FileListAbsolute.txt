@@ -1,0 +1,14 @@
+/Users/oneness/Projects/PaccarAPI/bin/Debug/netcoreapp2.2/PaccarAPI.deps.json
+/Users/oneness/Projects/PaccarAPI/bin/Debug/netcoreapp2.2/PaccarAPI.runtimeconfig.json
+/Users/oneness/Projects/PaccarAPI/bin/Debug/netcoreapp2.2/PaccarAPI.runtimeconfig.dev.json
+/Users/oneness/Projects/PaccarAPI/bin/Debug/netcoreapp2.2/PaccarAPI.dll
+/Users/oneness/Projects/PaccarAPI/bin/Debug/netcoreapp2.2/PaccarAPI.pdb
+/Users/oneness/Projects/PaccarAPI/obj/Debug/netcoreapp2.2/PaccarAPI.csprojAssemblyReference.cache
+/Users/oneness/Projects/PaccarAPI/obj/Debug/netcoreapp2.2/PaccarAPI.csproj.CoreCompileInputs.cache
+/Users/oneness/Projects/PaccarAPI/obj/Debug/netcoreapp2.2/PaccarAPI.RazorAssemblyInfo.cache
+/Users/oneness/Projects/PaccarAPI/obj/Debug/netcoreapp2.2/PaccarAPI.RazorAssemblyInfo.cs
+/Users/oneness/Projects/PaccarAPI/obj/Debug/netcoreapp2.2/PaccarAPI.AssemblyInfoInputs.cache
+/Users/oneness/Projects/PaccarAPI/obj/Debug/netcoreapp2.2/PaccarAPI.AssemblyInfo.cs
+/Users/oneness/Projects/PaccarAPI/obj/Debug/netcoreapp2.2/PaccarAPI.RazorTargetAssemblyInfo.cache
+/Users/oneness/Projects/PaccarAPI/obj/Debug/netcoreapp2.2/PaccarAPI.dll
+/Users/oneness/Projects/PaccarAPI/obj/Debug/netcoreapp2.2/PaccarAPI.pdb
