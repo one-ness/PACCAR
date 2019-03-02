@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PaccarAPI.Data;
 
 namespace PaccarAPI.Migrations
 {
     [DbContext(typeof(PaccarDbContext))]
-    partial class PaccarDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190301220254_sp-GetCompanies")]
+    partial class spGetCompanies
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,6 +50,8 @@ namespace PaccarAPI.Migrations
                     b.Property<int>("CompanyId");
 
                     b.HasKey("BestPracticeId", "CompanyId");
+
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("BestPracticeCompany");
                 });
@@ -100,6 +104,19 @@ namespace PaccarAPI.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("PaccarAPI.Models.BestPracticeCompany", b =>
+                {
+                    b.HasOne("PaccarAPI.Models.BestPractice")
+                        .WithMany("Companies")
+                        .HasForeignKey("BestPracticeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PaccarAPI.Models.Company")
+                        .WithMany("CompanyBestPractices")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

@@ -10,6 +10,7 @@ using System.Web.Http;
 using System.Net.Http;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
+using PaccarAPI.Controllers;
 
 namespace PaccarAPI.Controllers
 {
@@ -22,18 +23,18 @@ namespace PaccarAPI.Controllers
             db = dbContext;
         }
 
-        // GET: api/User
+        // GET: api/BestPractice
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BestPractice>>> GetBestPractices()
         {
-            return await db.BestPractices.ToListAsync();
+            return await db.BestPractice.ToListAsync();
         }
 
-        // GET: api/User/5
+        // GET: api/BestPractice/5
         [HttpGet("{id}")]
         public async Task<ActionResult<BestPractice>> GetBestPractice(int id)
         {
-            var bp = await db.BestPractices.FindAsync(id);
+            var bp = await db.BestPractice.FindAsync(id);
             if (bp == null)
             {
                 return NotFound();
@@ -53,17 +54,18 @@ namespace PaccarAPI.Controllers
         {
             string comp = removeChars(bp.Company);
             string dept = removeChars(bp.Department);
-            bp.Company = comp;
             bp.Department = dept;
-            db.BestPractices.Add(bp);
+            db.BestPractice.Add(bp);
             await db.SaveChangesAsync();
             int id = bp.Id;
+            addCompanies(comp, id);
+            await db.SaveChangesAsync();
             return CreatedAtAction(nameof(GetBestPractice), new {id}, bp);
         }
 
-        // PUT: api/User/5
+        // PUT: api/BestPractice/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBestPractice(int id, BestPractice bp)
+        public async Task<IActionResult> PutBestPractice(int id, [FromBody]BestPractice bp)
         {
             if (id != bp.Id)
             {
@@ -71,22 +73,26 @@ namespace PaccarAPI.Controllers
             }
             db.Entry(bp).State = EntityState.Modified;
             await db.SaveChangesAsync();
+            string comp = removeChars(bp.Company);
+            BestPracticeCompanyController bpc_cont = new BestPracticeCompanyController(db);
+            await bpc_cont.DeleteBestPracticeCompany(id);
+            addCompanies(comp, id);
+            await db.SaveChangesAsync();
             return NoContent();
         }
 
-        // DELETE: api/User/5
+        // DELETE: api/BestPractice/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBestPractice(int id)
         {
-            var bp = await db.BestPractices.FindAsync(id);
+            var bp = await db.BestPractice.FindAsync(id);
 
             if (bp == null)
             {
                 return NotFound();
             }
-            db.BestPractices.Remove(bp);
+            db.BestPractice.Remove(bp);
             await db.SaveChangesAsync();
-
             return NoContent();
         }
 
@@ -101,6 +107,37 @@ namespace PaccarAPI.Controllers
                 }
             }
             return output;
+        }
+
+        private void addCompanies(string comp, int id) {
+            string[] companies = comp.Split(',');
+            foreach(string c in companies) {
+                string company = c.Trim();
+                if(company.Equals("PACCAR", StringComparison.InvariantCultureIgnoreCase)) {
+                    db.BestPracticeCompany.Add(new BestPracticeCompany{
+                        BestPracticeId = id,
+                        CompanyId = 1
+                    });
+                }
+                else if(company.Equals("Peterbilt", StringComparison.InvariantCultureIgnoreCase)) {
+                    db.BestPracticeCompany.Add(new BestPracticeCompany{
+                        BestPracticeId = id,
+                        CompanyId = 3
+                    });
+                }
+                else if(company.Equals("DAF", StringComparison.InvariantCultureIgnoreCase)) {
+                    db.BestPracticeCompany.Add(new BestPracticeCompany{
+                        BestPracticeId = id,
+                        CompanyId = 4
+                    });
+                }
+                else if(company.Equals("Kenworth", StringComparison.InvariantCultureIgnoreCase)) {
+                    db.BestPracticeCompany.Add(new BestPracticeCompany{
+                        BestPracticeId = id,
+                        CompanyId = 2
+                    });
+                }
+            }
         }
     }
 }

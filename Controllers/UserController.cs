@@ -16,8 +16,8 @@ namespace PaccarAPI.Controllers
         
         public UserController(PaccarDbContext context) {
             db = context;
-            if(db.Users.Count() == 0) {
-                db.Users.Add(new User{ FirstName = "Keegan", LastName = "Fisher" });
+            if(db.User.Count() == 0) {
+                db.User.Add(new User{ FirstName = "Keegan", LastName = "Fisher" });
                 db.SaveChanges();
             }
         }
@@ -26,14 +26,14 @@ namespace PaccarAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await db.Users.ToListAsync();
+            return await db.User.ToListAsync();
         }
 
         // GET: api/User/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await db.Users.FindAsync(id);
+            var user = await db.User.FindAsync(id);
             if (user == null)
             {
                 return NotFound();
@@ -45,7 +45,7 @@ namespace PaccarAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            db.Users.Add(user);
+            db.User.Add(user);
             await db.SaveChangesAsync();
             return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
         }
@@ -67,14 +67,14 @@ namespace PaccarAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await db.Users.FindAsync(id);
+            var user = await db.User.FindAsync(id);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            db.Users.Remove(user);
+            db.User.Remove(user);
             await db.SaveChangesAsync();
 
             return NoContent();
