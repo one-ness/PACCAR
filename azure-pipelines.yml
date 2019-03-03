@@ -19,3 +19,10 @@ steps:
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(System.DefaultWorkingDirectory)'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: publish
+    publishWebProjects: True
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: True
