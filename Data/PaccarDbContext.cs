@@ -17,16 +17,29 @@ namespace PaccarAPI.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // set composite key for linking BP_Company table using Fluent API
+            // BestPracticeCompany Table Properties
+            modelBuilder.Entity<BestPracticeCompany>()
+            .HasOne(bpc => bpc.BestPractice)
+            .WithMany(bp => bp.BestPracticeCompanies)
+            .HasForeignKey(bpc => bpc.BestPracticeId)
+            .HasConstraintName("FK_BestPracticeId");
+
+            modelBuilder.Entity<BestPracticeCompany>()
+            .HasOne(bpc => bpc.Company)
+            .WithMany(c => c.CompanyBestPractices)
+            .HasForeignKey(bpc => bpc.CompanyId)
+            .HasConstraintName("FK_CompanyId");
+
             modelBuilder.Entity<BestPracticeCompany>()
             .HasKey(c => new { c.BestPracticeId, c.CompanyId });
+            
 
             // seed the Company table
             modelBuilder.Entity<Company>().HasData(
-                new Company() {Id = 1, Name = "PACCAR"},
-                new Company() {Id = 2, Name = "Kenworth"},
-                new Company() {Id = 3, Name = "Peterbilt"},
-                new Company() {Id = 4, Name = "DAF"}
+                new Company() {CompanyId = 1, Name = "PACCAR"},
+                new Company() {CompanyId = 2, Name = "Kenworth"},
+                new Company() {CompanyId = 3, Name = "Peterbilt"},
+                new Company() {CompanyId = 4, Name = "DAF"}
             );
         }
     }

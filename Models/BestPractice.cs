@@ -7,7 +7,7 @@ namespace PaccarAPI.Models
     public class BestPractice
     {
         [Key]
-        public int Id { get; set; }
+        public int BestPracticeId { get; set; }
         public string Title { get; set; }
         public string Date { get; set; }
         public string Summary { get; set; }
@@ -16,7 +16,7 @@ namespace PaccarAPI.Models
         public string PN { get; set; }
         [NotMapped]
         public string Company { get; set; }
-        [NotMapped]
-        public IEnumerable<BestPracticeCompany> BestPracticeCompanies {get; set;}
+
+        public ICollection<BestPracticeCompany> BestPracticeCompanies { get; set; }
     }
 }

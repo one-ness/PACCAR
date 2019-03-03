@@ -35,6 +35,7 @@ namespace PaccarAPI.Controllers
         public async Task<ActionResult<BestPractice>> GetBestPractice(int id)
         {
             var bp = await db.BestPractice.FindAsync(id);
+            
             if (bp == null)
             {
                 return NotFound();
@@ -57,7 +58,7 @@ namespace PaccarAPI.Controllers
             bp.Department = dept;
             db.BestPractice.Add(bp);
             await db.SaveChangesAsync();
-            int id = bp.Id;
+            int id = bp.BestPracticeId;
             addCompanies(comp, id);
             await db.SaveChangesAsync();
             return CreatedAtAction(nameof(GetBestPractice), new {id}, bp);
@@ -67,7 +68,7 @@ namespace PaccarAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBestPractice(int id, [FromBody]BestPractice bp)
         {
-            if (id != bp.Id)
+            if (id != bp.BestPracticeId)
             {
                 return BadRequest();
             }

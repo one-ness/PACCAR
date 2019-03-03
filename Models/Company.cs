@@ -7,9 +7,9 @@ namespace PaccarAPI.Models
     public class Company
     {
         [Key]
-        public int Id {get; set;}
+        public int CompanyId {get; set;}
         public string Name {get; set;}
-        [NotMapped]
-        public IEnumerable<BestPracticeCompany> CompanyBestPractices {get;set;}
+        
+        public ICollection<BestPracticeCompany> CompanyBestPractices {get;set;}
     }
 }

@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PaccarAPI.Data;
 
 namespace PaccarAPI.Migrations
 {
     [DbContext(typeof(PaccarDbContext))]
-    partial class PaccarDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190303071245_fixing_relations")]
+    partial class fixing_relations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,16 +108,14 @@ namespace PaccarAPI.Migrations
 
             modelBuilder.Entity("PaccarAPI.Models.BestPracticeCompany", b =>
                 {
-                    b.HasOne("PaccarAPI.Models.BestPractice", "BestPractice")
+                    b.HasOne("PaccarAPI.Models.BestPractice")
                         .WithMany("BestPracticeCompanies")
                         .HasForeignKey("BestPracticeId")
-                        .HasConstraintName("FK_BestPracticeId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("PaccarAPI.Models.Company", "Company")
+                    b.HasOne("PaccarAPI.Models.Company")
                         .WithMany("CompanyBestPractices")
                         .HasForeignKey("CompanyId")
-                        .HasConstraintName("FK_CompanyId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
