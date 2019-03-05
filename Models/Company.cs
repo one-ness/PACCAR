@@ -9,7 +9,7 @@ namespace PaccarAPI.Models
         [Key]
         public int CompanyId {get; set;}
         public string Name {get; set;}
-        
-        public ICollection<BestPracticeCompany> CompanyBestPractices {get;set;}
+
+        public IList<BestPracticeCompany> CompanyBestPractices {get;set;}
     }
 }

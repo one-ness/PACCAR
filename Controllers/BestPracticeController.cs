@@ -11,7 +11,8 @@ using System.Net.Http;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using PaccarAPI.Controllers;
-
+using System.Text;
+using Newtonsoft.Json;
 namespace PaccarAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -25,9 +26,18 @@ namespace PaccarAPI.Controllers
 
         // GET: api/BestPractice
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BestPractice>>> GetBestPractices()
+        public async Task<ActionResult<string>> GetBestPractices()
         {
-            return await db.BestPractice.ToListAsync();
+            IList<BestPractice> bestPractices = await db.BestPractice.Include(bp => bp.BestPracticeCompanies)
+                                         .ThenInclude(bpc => bpc.Company)
+                                         .ToListAsync();
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+            return Ok(bestPractices);
         }
 
         // GET: api/BestPractice/5
@@ -35,7 +45,6 @@ namespace PaccarAPI.Controllers
         public async Task<ActionResult<BestPractice>> GetBestPractice(int id)
         {
             var bp = await db.BestPractice.FindAsync(id);
-            
             if (bp == null)
             {
                 return NotFound();

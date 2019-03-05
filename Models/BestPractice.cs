@@ -16,7 +16,9 @@ namespace PaccarAPI.Models
         public string PN { get; set; }
         [NotMapped]
         public string Company { get; set; }
+        [NotMapped]
+        public bool IsGlobal { get; set; }
 
-        public ICollection<BestPracticeCompany> BestPracticeCompanies { get; set; }
+        public IList<BestPracticeCompany> BestPracticeCompanies { get; set; }
     }
 }

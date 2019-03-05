@@ -32,7 +32,6 @@ namespace PaccarAPI.Data
 
             modelBuilder.Entity<BestPracticeCompany>()
             .HasKey(c => new { c.BestPracticeId, c.CompanyId });
-            
 
             // seed the Company table
             modelBuilder.Entity<Company>().HasData(
