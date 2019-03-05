@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using PaccarAPI.Controllers;
 using System.Text;
 using Newtonsoft.Json;
+
 namespace PaccarAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -26,27 +27,22 @@ namespace PaccarAPI.Controllers
 
         // GET: api/BestPractice
         [HttpGet]
-        public async Task<ActionResult<string>> GetBestPractices()
+        public async Task<ActionResult<IEnumerable<BestPractice>>> GetBestPractices()
         {
-            IList<BestPractice> bestPractices = await db.BestPractice.Include(bp => bp.BestPracticeCompany)
-                                         .ThenInclude(bpc => bpc.Company)
-                                         .ToListAsync();
-            JsonSerializerSettings settings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                Formatting = Formatting.Indented,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects
-            };
-            var x = JsonConvert.SerializeObject(bestPractices, settings);
-            return x;
+            var bestPractices = await db.BestPractice
+                                        .Include(bp => bp.BestPracticeCompany)
+                                        .ToListAsync();
+            return bestPractices;
         }
 
         // GET: api/BestPractice/5
         [HttpGet("{id}")]
         public async Task<ActionResult<BestPractice>> GetBestPractice(int id)
         {
-            var bp = await db.BestPractice.Include(x => x.BestPracticeCompany).ThenInclude(x => x.Company).SingleOrDefaultAsync(x => x.BestPracticeId == id);
+            var bp = await db.BestPractice
+                             .Include(x => x.BestPracticeCompany)
+                             .ThenInclude(x => x.Company)
+                             .SingleOrDefaultAsync(x => x.BestPracticeId == id);
             if (bp == null)
             {
                 return NotFound();
@@ -64,13 +60,23 @@ namespace PaccarAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<BestPractice>> PostBestPractice([FromBody]BestPractice bp)
         {
-            string comp = removeChars(bp.Company);
+            string[] comps = removeChars(bp.Company).Split(",");
             string dept = removeChars(bp.Department);
             bp.Department = dept;
             db.BestPractice.Add(bp);
             await db.SaveChangesAsync();
             int id = bp.BestPracticeId;
-            addCompanies(comp, id);
+            // addCompanies
+            IList<Company> companyList = new List<Company>();
+            for(int i = 0; i< comps.Count(); i++) {
+                companyList.Add(db.Company.Where(entity => entity.Name.Equals(comps[i], StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault());
+            }
+            for(int i = 0; i < companyList.Count(); i++) {
+                db.BestPracticeCompany.Add(new BestPracticeCompany{
+                        BestPracticeId = id,
+                        CompanyId = companyList[i].CompanyId
+                });
+            }
             await db.SaveChangesAsync();
             return CreatedAtAction(nameof(GetBestPractice), new {id}, bp);
         }
@@ -85,10 +91,21 @@ namespace PaccarAPI.Controllers
             }
             db.Entry(bp).State = EntityState.Modified;
             await db.SaveChangesAsync();
-            string comp = removeChars(bp.Company);
+            string[] comps = removeChars(bp.Company).Split(",");
             BestPracticeCompanyController bpc_cont = new BestPracticeCompanyController(db);
             await bpc_cont.DeleteBestPracticeCompany(id);
-            addCompanies(comp, id);
+            // addCompanies
+            IList<Company> companyList = new List<Company>();
+            for(int i = 0; i< comps.Count(); i++) {
+                companyList.Add(db.Company.Where(entity => entity.Name.Equals(comps[i], StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault());
+            }
+            for(int i = 0; i < companyList.Count(); i++) {
+                db.BestPracticeCompany.Add(new BestPracticeCompany{
+                        BestPracticeId = id,
+                        CompanyId = companyList[i].CompanyId
+                });
+            }
+
             await db.SaveChangesAsync();
             return NoContent();
         }
@@ -111,45 +128,11 @@ namespace PaccarAPI.Controllers
         private static string removeChars(string input) {
             string output = "";
             foreach(char c in input) {
-                if(c != '\\' && c != '"' && c!= '[' && c!= ']') {
+                if(c != '\\' && c != '"' && c!= '[' && c!= ']' && c != ' ') {
                     output += c;
-                }
-                if(c == ',') {
-                    output += ' ';
                 }
             }
             return output;
-        }
-
-        private void addCompanies(string comp, int id) {
-            string[] companies = comp.Split(',');
-            foreach(string c in companies) {
-                string company = c.Trim();
-                if(company.Equals("PACCAR", StringComparison.InvariantCultureIgnoreCase)) {
-                    db.BestPracticeCompany.Add(new BestPracticeCompany{
-                        BestPracticeId = id,
-                        CompanyId = 1
-                    });
-                }
-                else if(company.Equals("Peterbilt", StringComparison.InvariantCultureIgnoreCase)) {
-                    db.BestPracticeCompany.Add(new BestPracticeCompany{
-                        BestPracticeId = id,
-                        CompanyId = 3
-                    });
-                }
-                else if(company.Equals("DAF", StringComparison.InvariantCultureIgnoreCase)) {
-                    db.BestPracticeCompany.Add(new BestPracticeCompany{
-                        BestPracticeId = id,
-                        CompanyId = 4
-                    });
-                }
-                else if(company.Equals("Kenworth", StringComparison.InvariantCultureIgnoreCase)) {
-                    db.BestPracticeCompany.Add(new BestPracticeCompany{
-                        BestPracticeId = id,
-                        CompanyId = 2
-                    });
-                }
-            }
         }
     }
 }
