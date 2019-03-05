@@ -28,23 +28,25 @@ namespace PaccarAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<string>> GetBestPractices()
         {
-            IList<BestPractice> bestPractices = await db.BestPractice.Include(bp => bp.BestPracticeCompanies)
+            IList<BestPractice> bestPractices = await db.BestPractice.Include(bp => bp.BestPracticeCompany)
                                          .ThenInclude(bpc => bpc.Company)
                                          .ToListAsync();
             JsonSerializerSettings settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
                 Formatting = Formatting.Indented,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects
             };
-            return Ok(bestPractices);
+            var x = JsonConvert.SerializeObject(bestPractices, settings);
+            return x;
         }
 
         // GET: api/BestPractice/5
         [HttpGet("{id}")]
         public async Task<ActionResult<BestPractice>> GetBestPractice(int id)
         {
-            var bp = await db.BestPractice.FindAsync(id);
+            var bp = await db.BestPractice.Include(x => x.BestPracticeCompany).ThenInclude(x => x.Company).SingleOrDefaultAsync(x => x.BestPracticeId == id);
             if (bp == null)
             {
                 return NotFound();

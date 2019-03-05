@@ -1,14 +1,14 @@
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
+
 namespace PaccarAPI.Models
 {
-    public class BestPracticeCompany
+    public partial class BestPracticeCompany
     {
-        public int BestPracticeId {get; set;}
+        public int BestPracticeId { get; set; }
+        public int CompanyId { get; set; }
 
-        public int CompanyId {get; set;}
-
-        public BestPractice BestPractice { get; set; }
-
-        public Company Company { get; set; }
+        public virtual BestPractice BestPractice { get; set; }
+        public virtual Company Company { get; set; }
     }
 }

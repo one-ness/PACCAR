@@ -1,15 +1,18 @@
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PaccarAPI.Models
 {
-    public class Company
+    public partial class Company
     {
-        [Key]
-        public int CompanyId {get; set;}
-        public string Name {get; set;}
+        public Company()
+        {
+            BestPracticeCompany = new HashSet<BestPracticeCompany>();
+        }
 
-        public IList<BestPracticeCompany> CompanyBestPractices {get;set;}
+        public int CompanyId { get; set; }
+        public string Name { get; set; }
+
+        public virtual ICollection<BestPracticeCompany> BestPracticeCompany { get; set; }
     }
 }

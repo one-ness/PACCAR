@@ -1,45 +1,59 @@
-// using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-// using Microsoft.AspNetCore.Identity;
+using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using PaccarAPI.Models;
 
 namespace PaccarAPI.Data
 {
-    public class PaccarDbContext : DbContext
+    public partial class PaccarDbContext : DbContext
     {
-        public PaccarDbContext(DbContextOptions<PaccarDbContext> options)
-            : base(options) {}
+        public PaccarDbContext()
+        {
+        }
 
-        public DbSet<User> User { get; set; }
-        public DbSet<BestPractice> BestPractice { get; set; }
-        public DbSet<BestPracticeCompany> BestPracticeCompany { get; set; }
-        public DbSet<Company> Company { get; set; }
+        public PaccarDbContext(DbContextOptions<PaccarDbContext> options)
+            : base(options)
+        {
+        }
+
+        public virtual DbSet<BestPractice> BestPractice { get; set; }
+        public virtual DbSet<BestPracticeCompany> BestPracticeCompany { get; set; }
+        public virtual DbSet<Company> Company { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseSqlServer("Server=localhost,1433;Database=PaccarDB;User Id=sa;Password=StarShooter91;");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // BestPracticeCompany Table Properties
-            modelBuilder.Entity<BestPracticeCompany>()
-            .HasOne(bpc => bpc.BestPractice)
-            .WithMany(bp => bp.BestPracticeCompanies)
-            .HasForeignKey(bpc => bpc.BestPracticeId)
-            .HasConstraintName("FK_BestPracticeId");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.1-servicing-10028");
 
-            modelBuilder.Entity<BestPracticeCompany>()
-            .HasOne(bpc => bpc.Company)
-            .WithMany(c => c.CompanyBestPractices)
-            .HasForeignKey(bpc => bpc.CompanyId)
-            .HasConstraintName("FK_CompanyId");
+            modelBuilder.Entity<BestPractice>(entity =>
+            {
+                entity.Property(e => e.Pn).HasColumnName("PN");
+            });
 
-            modelBuilder.Entity<BestPracticeCompany>()
-            .HasKey(c => new { c.BestPracticeId, c.CompanyId });
+            modelBuilder.Entity<BestPracticeCompany>(entity =>
+            {
+                entity.HasKey(e => new { e.BestPracticeId, e.CompanyId });
 
-            // seed the Company table
-            modelBuilder.Entity<Company>().HasData(
-                new Company() {CompanyId = 1, Name = "PACCAR"},
-                new Company() {CompanyId = 2, Name = "Kenworth"},
-                new Company() {CompanyId = 3, Name = "Peterbilt"},
-                new Company() {CompanyId = 4, Name = "DAF"}
-            );
+                entity.HasIndex(e => e.CompanyId);
+
+                entity.HasOne(d => d.BestPractice)
+                    .WithMany(p => p.BestPracticeCompany)
+                    .HasForeignKey(d => d.BestPracticeId)
+                    .HasConstraintName("FK_BestPracticeId");
+
+                entity.HasOne(d => d.Company)
+                    .WithMany(p => p.BestPracticeCompany)
+                    .HasForeignKey(d => d.CompanyId)
+                    .HasConstraintName("FK_CompanyId");
+            });
         }
     }
 }
