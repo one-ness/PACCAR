@@ -9,14 +9,15 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Net.Http;
 using System.Net;
-using System.Text.RegularExpressions;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Microsoft.EntityFrameworkCore;
+using PaccarAPI.Controllers;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace PaccarAPI.Controllers
 {
     [Route("api/[controller]")]
-    public class BestPracticeController : Controller
+    public class BestPracticeController : ControllerBase
     {
         private readonly PaccarDbContext db;
         public BestPracticeController(PaccarDbContext dbContext)
@@ -24,18 +25,24 @@ namespace PaccarAPI.Controllers
             db = dbContext;
         }
 
-        // GET: api/values
+        // GET: api/BestPractice
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<ActionResult<IEnumerable<BestPractice>>> GetBestPractices()
         {
-            return new string[] { "value1", "value2" };
+            var bestPractices = await db.BestPractice
+                                        .Include(bp => bp.BestPracticeCompany)
+                                        .ToListAsync();
+            return bestPractices;
         }
 
-        // GET: api/User/5
+        // GET: api/BestPractice/5
         [HttpGet("{id}")]
         public async Task<ActionResult<BestPractice>> GetBestPractice(int id)
         {
-            var bp = await db.BestPractices.FindAsync(id);
+            var bp = await db.BestPractice
+                             .Include(x => x.BestPracticeCompany)
+                             .ThenInclude(x => x.Company)
+                             .SingleOrDefaultAsync(x => x.BestPracticeId == id);
             if (bp == null)
             {
                 return NotFound();
@@ -53,52 +60,79 @@ namespace PaccarAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<BestPractice>> PostBestPractice([FromBody]BestPractice bp)
         {
-            // Regex rgx = new Regex("[^a-zA-Z0-9 -]");
-            // bp.Department = rgx.Replace(bp.Department, "");
-            string comp = "";
-            foreach(char c in bp.Company) {
-                if(c != '\\' && c != '"' && c!= '[' && c!= ']') {
-                    comp += c;
-                }
-                if(c == ',') {
-                    comp += ' ';
-                }
-            }
-
-            string dept = "";
-            foreach(char c in bp.Department) {
-                if(c != '\\' && c != '"' && c!= '[' && c!= ']') {
-                    dept += c;
-                }
-                if(c == ',') {
-                    dept += ' ';
-                }
-            }
-            BestPractice bpmodel = new BestPractice {
-                Title = bp.Title,
-                Summary = bp.Summary,
-                Date = bp.Date,
-                Company = comp,
-                Department = dept,
-                PN = bp.PN,
-                Practice = bp.Practice
-            };
-            db.BestPractices.Add(bpmodel);
+            string[] comps = removeChars(bp.Company).Split(",");
+            string dept = removeChars(bp.Department);
+            bp.Department = dept;
+            db.BestPractice.Add(bp);
             await db.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetBestPractice), new { id = bpmodel.Id }, bp);
+            int id = bp.BestPracticeId;
+            // addCompanies
+            IList<Company> companyList = new List<Company>();
+            for(int i = 0; i< comps.Count(); i++) {
+                companyList.Add(db.Company.Where(entity => entity.Name.Equals(comps[i], StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault());
+            }
+            for(int i = 0; i < companyList.Count(); i++) {
+                db.BestPracticeCompany.Add(new BestPracticeCompany{
+                        BestPracticeId = id,
+                        CompanyId = companyList[i].CompanyId
+                });
+            }
+            await db.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetBestPractice), new {id}, bp);
         }
 
-        // PUT api/values/5
+        // PUT: api/BestPractice/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public async Task<IActionResult> PutBestPractice(int id, [FromBody]BestPractice bp)
         {
+            if (id != bp.BestPracticeId)
+            {
+                return BadRequest();
+            }
+            db.Entry(bp).State = EntityState.Modified;
+            await db.SaveChangesAsync();
+            string[] comps = removeChars(bp.Company).Split(",");
+            BestPracticeCompanyController bpc_cont = new BestPracticeCompanyController(db);
+            await bpc_cont.DeleteBestPracticeCompany(id);
+            // addCompanies
+            IList<Company> companyList = new List<Company>();
+            for(int i = 0; i< comps.Count(); i++) {
+                companyList.Add(db.Company.Where(entity => entity.Name.Equals(comps[i], StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault());
+            }
+            for(int i = 0; i < companyList.Count(); i++) {
+                db.BestPracticeCompany.Add(new BestPracticeCompany{
+                        BestPracticeId = id,
+                        CompanyId = companyList[i].CompanyId
+                });
+            }
+
+            await db.SaveChangesAsync();
+            return NoContent();
         }
 
-        // DELETE api/values/5
+        // DELETE: api/BestPractice/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> DeleteBestPractice(int id)
         {
+            var bp = await db.BestPractice.FindAsync(id);
 
+            if (bp == null)
+            {
+                return NotFound();
+            }
+            db.BestPractice.Remove(bp);
+            await db.SaveChangesAsync();
+            return NoContent();
+        }
+
+        private static string removeChars(string input) {
+            string output = "";
+            foreach(char c in input) {
+                if(c != '\\' && c != '"' && c!= '[' && c!= ']' && c != ' ') {
+                    output += c;
+                }
+            }
+            return output;
         }
     }
 }
