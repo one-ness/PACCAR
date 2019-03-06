@@ -25,7 +25,7 @@ namespace PaccarAPI.Data
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=localhost,1433;Database=PaccarDB;User Id=sa;Password=StarShooter91;");
+                optionsBuilder.UseMySQL("Server=127.0.0.1;port=3306;Database=PaccarDB;User Id=root;Password=StarFox-91;");
             }
         }
 
@@ -35,24 +35,88 @@ namespace PaccarAPI.Data
 
             modelBuilder.Entity<BestPractice>(entity =>
             {
-                entity.Property(e => e.Pn).HasColumnName("PN");
+                entity.ToTable("BestPractice", "PaccarDB");
+
+                entity.Property(e => e.BestPracticeId)
+                    .HasColumnName("BestPracticeID")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Company)
+                    .IsRequired()
+                    .HasMaxLength(45)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Date)
+                    .IsRequired()
+                    .HasMaxLength(45)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Department)
+                    .IsRequired()
+                    .HasMaxLength(45)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Pn)
+                    .HasColumnName("PN")
+                    .HasMaxLength(45)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Practice)
+                    .HasMaxLength(45)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Summary)
+                    .IsRequired()
+                    .HasMaxLength(45)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Title)
+                    .IsRequired()
+                    .HasMaxLength(45)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<BestPracticeCompany>(entity =>
             {
                 entity.HasKey(e => new { e.BestPracticeId, e.CompanyId });
 
-                entity.HasIndex(e => e.CompanyId);
+                entity.ToTable("BestPractice_Company", "PaccarDB");
+
+                entity.HasIndex(e => e.CompanyId)
+                    .HasName("CompanyID_idx");
+
+                entity.Property(e => e.BestPracticeId)
+                    .HasColumnName("BestPracticeID")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.CompanyId)
+                    .HasColumnName("CompanyID")
+                    .HasColumnType("int(11)");
 
                 entity.HasOne(d => d.BestPractice)
                     .WithMany(p => p.BestPracticeCompany)
                     .HasForeignKey(d => d.BestPracticeId)
-                    .HasConstraintName("FK_BestPracticeId");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("BestPracticeID");
 
                 entity.HasOne(d => d.Company)
                     .WithMany(p => p.BestPracticeCompany)
                     .HasForeignKey(d => d.CompanyId)
-                    .HasConstraintName("FK_CompanyId");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("CompanyID");
+            });
+
+            modelBuilder.Entity<Company>(entity =>
+            {
+                entity.ToTable("Company", "PaccarDB");
+
+                entity.Property(e => e.CompanyId)
+                    .HasColumnName("CompanyID")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(45)
+                    .IsUnicode(false);
             });
         }
     }
