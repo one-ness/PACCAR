@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using PaccarAPI.Data;
+using MySql.Data.EntityFrameworkCore.Extensions;
 
 namespace PaccarAPI
 {
@@ -38,7 +39,7 @@ namespace PaccarAPI
 
             // Register PaccarDB for dependency injection
             services.AddDbContext<PaccarDbContext>(options => 
-                options.UseSqlServer(Configuration.GetConnectionString("PaccarDbContext")));
+                options.UseMySQL(Configuration.GetConnectionString("PaccarDbContext")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2) 
             .AddJsonOptions(options => 

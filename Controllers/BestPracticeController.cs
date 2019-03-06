@@ -41,7 +41,7 @@ namespace PaccarAPI.Controllers
         {
             var bp = await db.BestPractice
                              .Include(x => x.BestPracticeCompany)
-                             .ThenInclude(x => x.Company)
+                                .ThenInclude(x => x.Company)
                              .SingleOrDefaultAsync(x => x.BestPracticeId == id);
             if (bp == null)
             {
@@ -64,7 +64,6 @@ namespace PaccarAPI.Controllers
             string dept = removeChars(bp.Department);
             bp.Department = dept;
             db.BestPractice.Add(bp);
-            await db.SaveChangesAsync();
             int id = bp.BestPracticeId;
             // addCompanies
             IList<Company> companyList = new List<Company>();
@@ -90,21 +89,22 @@ namespace PaccarAPI.Controllers
                 return BadRequest();
             }
             db.Entry(bp).State = EntityState.Modified;
-            await db.SaveChangesAsync();
             string[] comps = removeChars(bp.Company).Split(",");
             BestPracticeCompanyController bpc_cont = new BestPracticeCompanyController(db);
             await bpc_cont.DeleteBestPracticeCompany(id);
             // addCompanies
-            IList<Company> companyList = new List<Company>();
-            for(int i = 0; i< comps.Count(); i++) {
-                companyList.Add(db.Company.Where(entity => entity.Name.Equals(comps[i], StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault());
-            }
-            for(int i = 0; i < companyList.Count(); i++) {
-                db.BestPracticeCompany.Add(new BestPracticeCompany{
-                        BestPracticeId = id,
-                        CompanyId = companyList[i].CompanyId
-                });
-            }
+            addCompanies(id, comps);
+
+            // IList<Company> companyList = new List<Company>();
+            // for(int i = 0; i< comps.Count(); i++) {
+            //     companyList.Add(db.Company.Where(entity => entity.Name.Equals(comps[i], StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault());
+            // }
+            // for(int i = 0; i < companyList.Count(); i++) {
+            //     db.BestPracticeCompany.Add(new BestPracticeCompany{
+            //             BestPracticeId = id,
+            //             CompanyId = companyList[i].CompanyId
+            //     });
+            // }
 
             await db.SaveChangesAsync();
             return NoContent();
@@ -125,7 +125,7 @@ namespace PaccarAPI.Controllers
             return NoContent();
         }
 
-        private static string removeChars(string input) {
+        private string removeChars(string input) {
             string output = "";
             foreach(char c in input) {
                 if(c != '\\' && c != '"' && c!= '[' && c!= ']' && c != ' ') {
@@ -133,6 +133,19 @@ namespace PaccarAPI.Controllers
                 }
             }
             return output;
+        }
+
+        private void addCompanies(int id, string[] comps) {
+            IList<Company> companyList = new List<Company>();
+            for(int i = 0; i< comps.Count(); i++) {
+                companyList.Add(db.Company.Where(entity => entity.Name.Equals(comps[i], StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault());
+            }
+            for(int i = 0; i < companyList.Count(); i++) {
+                db.BestPracticeCompany.Add(new BestPracticeCompany{
+                        BestPracticeId = id,
+                        CompanyId = companyList[i].CompanyId
+                });
+            }
         }
     }
 }
