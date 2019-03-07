@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.2",
-    "signature": "311adf87cf7d3c026b0d145b6c64403c7bb786df"
+    "signature": "4f75ccaa8768700b0eb3862c592918745864139f"
   },
   "compilationOptions": {
     "defines": [
@@ -24,6 +24,7 @@
     ".NETCoreApp,Version=v2.2": {
       "PaccarAPI/1.0.0": {
         "dependencies": {
+          "Lucene.Net.Core": "4.9.0",
           "Microsoft.AspNetCore.App": "2.2.0",
           "Microsoft.AspNetCore.Razor.Design": "2.2.0",
           "Microsoft.NETCore.App": "2.2.0",
@@ -48,6 +49,20 @@
         },
         "compile": {
           "lib/netstandard1.0/Google.Protobuf.dll": {}
+        }
+      },
+      "Lucene.Net.Core/4.9.0": {
+        "dependencies": {
+          "System.Collections.Immutable": "1.5.0"
+        },
+        "runtime": {
+          "lib/net451/Lucene.Net.Core.dll": {
+            "assemblyVersion": "4.9.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        },
+        "compile": {
+          "lib/net451/Lucene.Net.Core.dll": {}
         }
       },
       "Microsoft.NETCore.App/2.2.0": {
@@ -3313,6 +3328,13 @@
       "sha512": "sha512-j/gbpRZ68sgvdi/vXI39Cj/jWG4d1dtDqfWbkjC9dErNWu/dFcIlq1LIgLscea+llZ6nzm06wz/JGziOegAL7Q==",
       "path": "google.protobuf/3.5.1",
       "hashPath": "google.protobuf.3.5.1.nupkg.sha512"
+    },
+    "Lucene.Net.Core/4.9.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-+kHNnAIl6omsJ6sOMGz+HnXqxOwDGOX0UJwA9j062yfZzK+z3O6lU/38YG6e0bDs0K8HiGogQ5silZULDYLxOA==",
+      "path": "lucene.net.core/4.9.0",
+      "hashPath": "lucene.net.core.4.9.0.nupkg.sha512"
     },
     "Microsoft.NETCore.App/2.2.0": {
       "type": "package",
