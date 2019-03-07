@@ -14,6 +14,18 @@
           "lib/netstandard1.0/Google.Protobuf.dll": {}
         }
       },
+      "Lucene.Net.Core/4.9.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Collections.Immutable": "1.2.0"
+        },
+        "compile": {
+          "lib/net451/Lucene.Net.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net451/Lucene.Net.Core.dll": {}
+        }
+      },
       "Microsoft.AspNet.WebApi.Client/5.2.6": {
         "type": "package",
         "dependencies": {
@@ -4522,6 +4534,18 @@
         "lib/net45/Google.Protobuf.xml",
         "lib/netstandard1.0/Google.Protobuf.dll",
         "lib/netstandard1.0/Google.Protobuf.xml"
+      ]
+    },
+    "Lucene.Net.Core/4.9.0": {
+      "sha512": "+kHNnAIl6omsJ6sOMGz+HnXqxOwDGOX0UJwA9j062yfZzK+z3O6lU/38YG6e0bDs0K8HiGogQ5silZULDYLxOA==",
+      "type": "package",
+      "path": "lucene.net.core/4.9.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net451/Lucene.Net.Core.dll",
+        "lucene.net.core.4.9.0.nupkg.sha512",
+        "lucene.net.core.nuspec"
       ]
     },
     "Microsoft.AspNet.WebApi.Client/5.2.6": {
@@ -12248,6 +12272,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.2": [
+      "Lucene.Net.Core >= 4.9.0",
       "Microsoft.AspNetCore.App >= 2.2.0",
       "Microsoft.AspNetCore.Razor.Design >= 2.2.0",
       "Microsoft.NETCore.App >= 2.2.0",
@@ -12293,6 +12318,10 @@
     "frameworks": {
       "netcoreapp2.2": {
         "dependencies": {
+          "Lucene.Net.Core": {
+            "target": "Package",
+            "version": "[4.9.0, )"
+          },
           "Microsoft.AspNetCore.App": {
             "suppressParent": "All",
             "target": "Package",
@@ -12322,5 +12351,17 @@
         "warn": true
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Lucene.Net.Core 4.9.0' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.2'. This package may not be fully compatible with your project.",
+      "libraryId": "Lucene.Net.Core",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v2.2"
+      ]
+    }
+  ]
 }

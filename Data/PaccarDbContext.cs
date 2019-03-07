@@ -118,6 +118,13 @@ namespace PaccarAPI.Data
                     .HasMaxLength(45)
                     .IsUnicode(false);
             });
+
+            modelBuilder.Entity<Company>().HasData(
+                new {CompanyId = 1, Name = "PACCAR"},
+                new {CompanyId = 2, Name = "Kenworth"},
+                new {CompanyId = 3, Name = "Peterbilt"},
+                new {CompanyId = 4, Name = "DAF"}
+            );
         }
     }
 }

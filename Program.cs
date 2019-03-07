@@ -22,7 +22,6 @@ namespace PaccarAPI
                 var services = scope.ServiceProvider;
                 var dbContext =
                 services.GetRequiredService<PaccarAPI.Data.PaccarDbContext>();
-                // dbContext.Database.Migrate();
             }
             host.Run();
         }

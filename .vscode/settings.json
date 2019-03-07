@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/a40f2b3e-5f19-4af0-97fa-adc212054604/resourceGroups/pkssAPI/providers/Microsoft.Web/sites/pkssAPI",
+    "appService.deploySubpath": ""
+}
